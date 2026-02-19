@@ -57,16 +57,12 @@ MODEL_INFO = {
         "Momentum_5",
         "Volatility_10",
         "High_Low_Spread",
-        "MA_5",
-        "MA_20",
         "MA_Crossover"
     ],
     "inputs": [
         {"name": "Momentum_5", "min": -1.0, "max": 1.0, "default": 0.0, "step": 0.01},
         {"name": "Volatility_10", "min": 0.0, "max": 1.0, "default": 0.05, "step": 0.01},
         {"name": "High_Low_Spread", "min": 0.0, "max": 1.0, "default": 0.02, "step": 0.01},
-        {"name": "MA_5", "min": 0.0, "max": 2000.0, "default": 0.0, "step": 1.0},
-        {"name": "MA_20", "min": 0.0, "max": 2000.0, "default": 0.0, "step": 1.0},
         {"name": "MA_Crossover", "min": -1.0, "max": 1.0, "default": 0.0, "step": 1.0},
     ],
 }
