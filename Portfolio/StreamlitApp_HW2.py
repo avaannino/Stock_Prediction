@@ -6,8 +6,6 @@ import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 import posixpath
-import joblib
-import tarfile
 import tempfile
 import boto3
 import sagemaker
@@ -52,7 +50,6 @@ sm_session = sagemaker.Session(boto_session=session)
 MODEL_INFO = {
     "endpoint": aws_endpoint,
     "explainer": "explainer.shap",
-    "pipeline": "finalized_model.tar.gz",
     "keys": [
         "Momentum_5",
         "Volatility_10",
@@ -94,8 +91,12 @@ def call_model_api(input_df):
 
     try:
         raw_pred = predictor.predict(input_df.values.astype(np.float32))
-        pred_val = float(raw_pred[0][0])
+
+        # Safe extraction (handles scalar, 1D, 2D outputs)
+        pred_val = float(np.array(raw_pred).flatten()[0])
+
         return round(pred_val, 4), 200
+
     except Exception as e:
         return f"Error: {str(e)}", 500
 
@@ -146,7 +147,6 @@ with st.form("prediction_form"):
 if submitted:
 
     data_row = [user_inputs[k] for k in MODEL_INFO["keys"]]
-
     input_df = pd.DataFrame([data_row], columns=MODEL_INFO["keys"])
 
     result, status = call_model_api(input_df)
