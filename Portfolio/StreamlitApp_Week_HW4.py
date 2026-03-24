@@ -103,7 +103,9 @@ def call_model_api(input_df):
     try:
         raw_pred = predictor.predict(input_df)
         pred_val = pd.DataFrame(raw_pred).values[-1][0]
-        return round(float(pred_val), 4), 200
+        signal_map = {1: '🟢 BUY', -1: '🔴 SELL', 0: '🟡 HOLD'}
+        pred_label = signal_map.get(int(pred_val), 'Unknown')
+        return pred_label, 200
     except Exception as e:
         return f"Error: {str(e)}", 500
 
