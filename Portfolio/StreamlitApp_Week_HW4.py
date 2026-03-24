@@ -119,7 +119,7 @@ def display_explanation(input_df, session, aws_bucket):
     input_df_transformed = pd.DataFrame(input_df_transformed, columns=feature_names)
     shap_values = explainer(input_df_transformed)
     
-    shap_values = explainer(input_df)
+    
     
     
     st.subheader("🔍 Decision Transparency (SHAP)")
