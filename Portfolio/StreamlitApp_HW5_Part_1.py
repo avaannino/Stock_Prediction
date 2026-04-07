@@ -57,8 +57,8 @@ MODEL_INFO = {
         "endpoint": aws_endpoint,
         "explainer": 'explainer_pca.shap', 
         "pipeline": 'finalized_pca_model.tar.gz', 
-        "keys": ["TSLA"], 
-        "inputs": [{"name": k, "type": "number", "min": -100.0, "max": 100.0, "default": 0.0, "step": 10.0} for k in ["TSLA"]] 
+        "keys": ["IBM_CR_Cum","NVDA_CR_Cum"], 
+        "inputs": [{"name": k, "type": "number", "min": -100.0, "max": 100.0, "default": 0.0, "step": 10.0} for k in ["IBM_CR_Cum","NVDA_CR_Cum"]] 
 }
 
 def load_pipeline(_session, bucket, key):
@@ -115,8 +115,10 @@ def display_explanation(input_df, session, aws_bucket):
 
     best_pipeline = load_pipeline(session, aws_bucket, 'sklearn-pipeline-deployment')
     
-    preprocessing_pipeline = Pipeline(steps=best_pipeline.steps[0:3]) 
-    input_df_transformed = preprocessing_pipeline.transform(input_df)  
+    preprocessing_pipeline = Pipeline(steps=best_pipeline.steps[0:2]) 
+    input_df_transformed = preprocessing_pipeline.transform(input_df) 
+    feature_names = best_pipeline[0:2].get_feature_names_out() 
+    input_df_transformed = pd.DataFrame(input_df_transformed, columns=feature_names) 
     shap_values = explainer(input_df_transformed) 
   
     st.subheader("🔍 Decision Transparency (SHAP)")
