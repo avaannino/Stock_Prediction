@@ -4,6 +4,9 @@ import statsmodels.api as sm
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import PowerTransformer
 from scipy.stats import skew
+from gensim.models import Word2Vec
+
+
 
 class AutoPowerTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, threshold=0.75):
@@ -137,6 +140,8 @@ class FeatureEngineer(BaseEstimator, TransformerMixin):
             # 5. Simple Moving Average
             X_out[f'MA_{w}'] = data.rolling(w, min_periods=w).mean()
 
+            # 6. Oscillators
+
         return X_out
 
 class PairFeatureEngineer(BaseEstimator, TransformerMixin):
@@ -210,6 +215,32 @@ class PairFeatureEngineer(BaseEstimator, TransformerMixin):
         rolling_mean = spread_series.rolling(self.window).mean()
         rolling_std = spread_series.rolling(self.window).std()
         return (spread_series - rolling_mean) / rolling_std
+
+class Word2VecTransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, vector_size=100, window=5, min_count=1):
+        self.vector_size = vector_size
+        self.window = window
+        self.min_count = min_count
+        self.model = None
+
+    def fit(self, X, y=None):
+        # create the word2vec model
+        sentences = [str(row[0]).split() for row in X]
+        self.model = Word2Vec(sentences, vector_size=self.vector_size, 
+                              window=self.window, min_count=self.min_count)
+        return self
+
+    def transform(self, X):
+        # Convert each headline into the average of its word vectors
+        def get_mean_vector(text):
+            words = str(text).split()
+            # Filter words that actually exist in the Word2Vec vocabulary
+            vectors = [self.model.wv[w] for w in words if w in self.model.wv]
+            if not vectors:
+                return np.zeros(self.vector_size)
+            return np.mean(vectors, axis=0)
+
+        return np.array([get_mean_vector(row[0]) for row in X])
 
 # --- Usage Example ---
 # extractor = PairFeatureExtractor(window=60)
