@@ -109,7 +109,7 @@ def call_model_api(input_df):
         pred_val = int(pd.DataFrame(raw_pred).values[-1][0])
         best_pipeline = load_pipeline(session, aws_bucket, 'sklearn-pipeline-deployment')
         proba = best_pipeline.predict_proba(full_row)[0][1]
-        return pred_val, round(float(proba), 4), 200
+        return pred_val, round(float(proba), 4), 200, full_row
     except Exception as e:
         return None, None, f"Error: {str(e)}"
 
@@ -172,7 +172,7 @@ if submitted:
     input_df = pd.DataFrame([data_row], columns=MODEL_INFO["keys"])
 
     with st.spinner("Running prediction..."):
-        pred_val, proba, status = call_model_api(input_df)
+        pred_val, proba, status, full_row = call_model_api(input_df)
 
     if status == 200:
         st.divider()
@@ -198,7 +198,9 @@ if submitted:
         else:
             st.success("✅ This transaction appears legitimate. Recommended action: **Approve.**")
 
-        
+        st.divider()
+        with st.expander("📊 View SHAP Explanation", expanded=True):
+            display_explanation(full_row)
 
     else:
         st.error(status)
