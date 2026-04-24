@@ -92,8 +92,21 @@ def call_model_api(input_df):
         deserializer=NumpyDeserializer()
     )
     try:
-        raw_pred = predictor.predict(input_df.values)
+        # Load feature names from S3
+        s3_client = session.client('s3')
+        s3_client.download_file(Bucket=aws_bucket, Key='feature_names.json', Filename='feature_names.json')
+        with open('feature_names.json') as f:
+            feature_names = json.load(f)
+
+        # Create full row with zeros, fill in user inputs
+        full_row = pd.DataFrame([np.zeros(len(feature_names))], columns=feature_names)
+        for k, v in input_df.items():
+            if k in full_row.columns:
+                full_row[k] = v
+
+        raw_pred = predictor.predict(full_row.values)
         pred_val = int(pd.DataFrame(raw_pred).values[-1][0])
+        proba = best_pipeline.predict_proba(full_row)[0][1]
         # Also get probability if possible — use the pipeline locally for proba
         best_pipeline = load_pipeline(session, aws_bucket, 'sklearn-pipeline-deployment')
         proba = best_pipeline.predict_proba(input_df)[0][1]
