@@ -107,10 +107,8 @@ def call_model_api(input_df):
 
         raw_pred = predictor.predict(full_row.values)
         pred_val = int(pd.DataFrame(raw_pred).values[-1][0])
-        proba = best_pipeline.predict_proba(full_row)[0][1]
-        # Also get probability if possible — use the pipeline locally for proba
         best_pipeline = load_pipeline(session, aws_bucket, 'sklearn-pipeline-deployment')
-        proba = best_pipeline.predict_proba(input_df)[0][1]
+        proba = best_pipeline.predict_proba(full_row)[0][1]
         return pred_val, round(float(proba), 4), 200
     except Exception as e:
         return None, None, f"Error: {str(e)}"
