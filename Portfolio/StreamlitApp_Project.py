@@ -198,9 +198,7 @@ if submitted:
         else:
             st.success("✅ This transaction appears legitimate. Recommended action: **Approve.**")
 
-        st.divider()
-        with st.expander("📊 View SHAP Explanation", expanded=True):
-            display_explanation(input_df)
+        
 
     else:
         st.error(status)
