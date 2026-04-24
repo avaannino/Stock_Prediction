@@ -111,7 +111,7 @@ def call_model_api(input_df):
         proba = best_pipeline.predict_proba(full_row)[0][1]
         return pred_val, round(float(proba), 4), 200, full_row
     except Exception as e:
-        return None, None, f"Error: {str(e)}"
+        return None, None, f"Error: {str(e)}", None
 
 # ── SHAP explanation display ───────────────────────────────────────────────────
 def display_explanation(input_df):
