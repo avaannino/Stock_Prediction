@@ -118,15 +118,13 @@ def display_explanation(input_df):
     explainer_name = MODEL_INFO["explainer"]
     local_path     = os.path.join(tempfile.gettempdir(), explainer_name)
 
-    explainer    = load_shap_explainer(session, aws_bucket,
-                       posixpath.join('explainer', explainer_name), local_path)
+    explainer     = load_shap_explainer(session, aws_bucket,
+                        posixpath.join('explainer', explainer_name), local_path)
     best_pipeline = load_pipeline(session, aws_bucket, 'sklearn-pipeline-deployment')
 
-    # Run preprocessing (all steps except final model)
     preprocessing_pipeline = Pipeline(steps=best_pipeline.steps[:-1])
     input_transformed = preprocessing_pipeline.transform(input_df)
-    feature_names_out = MODEL_INFO["keys"]  # simplified; adapt if pipeline adds features
-    input_df_tf = pd.DataFrame(input_transformed, columns=feature_names_out)
+    input_df_tf = pd.DataFrame(input_transformed, columns=input_df.columns)
 
     shap_values = explainer(input_df_tf)
 
