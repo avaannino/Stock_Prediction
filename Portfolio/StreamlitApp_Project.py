@@ -142,7 +142,7 @@ st.set_page_config(page_title="Fraud Detection — ML App", layout="wide")
 
 st.title("🔐 Fraud Detection — Real-Time Transaction Scoring")
 st.markdown("""
-This app uses a **Random Forest classifier** trained on the IEEE-CIS Fraud Detection dataset.  
+This app uses a **LightGBM classifier** trained on the IEEE-CIS Fraud Detection dataset.  
 """)
 
 st.divider()
@@ -206,7 +206,7 @@ if submitted:
 with st.sidebar:
     st.header("ℹ️ About")
     st.markdown("""
-**Model:** Random Forest Classifier  
+**Model:** LightGBM Classifier  
 **Dataset:** IEEE-CIS Fraud Detection  
 **Resampling:** SMOTE  
 **Primary Metric:** ROC-AUC  
